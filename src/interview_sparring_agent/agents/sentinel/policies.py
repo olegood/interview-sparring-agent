@@ -60,3 +60,43 @@ def check_feedback_groundedness(report: FeedbackReport, state: SessionState) -> 
     if problems:
         return False, "; ".join(problems)
     return True, None
+
+def check_feedback_coverage(
+    report: FeedbackReport, state: SessionState
+) -> tuple[bool, str | None]:
+    """Verify every QAExchange has exactly one corresponding FeedbackItem -
+    no duplicates, none missing.
+    """
+    expected = set(range(len(state["qa_history"])))
+    actual_indices = [item.exchange_index for item in report.items]
+
+    duplicates = {i for i in actual_indices if actual_indices.count(i) > 1}
+    missing = expected - set(actual_indices)
+
+    if duplicates or missing:
+        parts = []
+        if duplicates:
+            parts.append(f"duplicate indices: {sorted(duplicates)}")
+        if missing:
+            parts.append(f"missing indices: {sorted(missing)}")
+        return False, "; ".join(parts)
+
+    return True, None
+
+
+def review_feedback_report(
+    report: FeedbackReport, state: SessionState
+) -> tuple[bool, str | None]:
+    """Run all Sentinel policy checks against a feedback report and combine
+    the results into a single approved/notes verdict.
+    """
+    checks = [
+        check_feedback_groundedness(report, state),
+        check_feedback_coverage(report, state),
+    ]
+
+    approved = all(ok for ok, _ in checks)
+    notes_list = [notes for ok, notes in checks if not ok and notes]
+    notes = "; ".join(notes_list) if notes_list else None
+
+    return approved, notes

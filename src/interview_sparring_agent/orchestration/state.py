@@ -60,3 +60,4 @@ class SessionState(TypedDict):
 
     # --- feedback phase state ---
     feedback_report: FeedbackReport | None
+    feedback_retry_count: int

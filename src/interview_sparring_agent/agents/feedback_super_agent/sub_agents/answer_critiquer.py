@@ -6,6 +6,7 @@ from pydantic import BaseModel, Field
 
 from interview_sparring_agent.agents.feedback_super_agent.prompts import (
     ANSWER_CRITIQUER_SYSTEM_PROMPT,
+    RETRY_CONTEXT_TEMPLATE
 )
 from interview_sparring_agent.agents.feedback_super_agent.sub_agents.filler_word_detector import (
     detect_filler_words,
@@ -48,6 +49,10 @@ def answer_critiquer_node(state: SessionState) -> dict:
         level=state["level"],
         transcript=_format_transcript(state),
     )
+
+    prior_report = state.get("feedback_report")
+    if prior_report is not None and not prior_report.sentinel_approved and prior_report.sentinel_notes:
+        prompt += RETRY_CONTEXT_TEMPLATE.format(notes=prior_report.sentinel_notes)
 
     result: _CritiqueResult = structured_model.invoke(prompt)
 

@@ -27,3 +27,13 @@ Transcript:
 After the per-question feedback, provide an overall_summary (3-5 sentences)
 of the candidate's performance across the whole session.
 """
+
+RETRY_CONTEXT_TEMPLATE = """
+
+IMPORTANT - your previous attempt was rejected for this reason:
+{notes}
+
+When quoting the candidate's answer in grounding_quotes, you MUST copy the
+exact text, including any typos, misspellings, or grammar issues. Do NOT
+silently correct or clean up the candidate's wording when quoting them.
+"""
