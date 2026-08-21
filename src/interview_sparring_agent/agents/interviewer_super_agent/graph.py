@@ -1,6 +1,7 @@
 """InterviewerSuperAgent graph: runs the adaptive interview loop."""
 
 from langgraph.checkpoint.memory import MemorySaver
+from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.graph import END, START, StateGraph
 
 from interview_sparring_agent.agents.interviewer_super_agent.sub_agents.collect_answer import (
@@ -42,4 +43,9 @@ def build_interviewer_graph():
         {"continue": "question_selector", "done": END},
     )
 
-    return builder.compile(checkpointer=MemorySaver())
+    serde = JsonPlusSerializer(
+        allowed_msgpack_modules=[
+            ("interview_sparring_agent.orchestration.state", "QAExchange"),
+        ]
+    )
+    return builder.compile(checkpointer=MemorySaver(serde=serde))
