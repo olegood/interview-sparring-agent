@@ -44,6 +44,10 @@ def main() -> None:
     print("=== Overall summary ===")
     print(report.overall_summary)
 
+    print("\n=== Sentinel review ===")
+    print("Approved:", report.sentinel_approved)
+    print("Notes:", report.sentinel_notes)
+
     for item in report.items:
         print(f"\n--- Feedback for Q{item.exchange_index} ---")
         print("Critique:", item.critique)
